@@ -29,6 +29,8 @@ environment:
 dependencies:
   flutter:
     sdk: flutter
+  
+    
 
 
   # The following adds the Cupertino Icons font to your application.
@@ -57,6 +59,10 @@ dev_dependencies:
   # package. See that file for information about deactivating specific lint
   # rules and activating additional ones.
   flutter_lints: ^2.0.0
+  flutter_launcher_icons: ^0.9.3
+flutter_icons:
+  android: true
+  image_path: "assets/images/letter-s.png"
 
 # For information on the generic Dart part of this file, see the
 # following page: https://dart.dev/tools/pub/pubspec
@@ -76,6 +82,7 @@ flutter:
     - assets/images/forgot_pass.jpg
     - assets/images/avatar.png
     - assets/images/app_logo.png
+    - assets/images/letter-s.png
    
 
   # An image asset can refer to one or more resolution-specific "variants", see
