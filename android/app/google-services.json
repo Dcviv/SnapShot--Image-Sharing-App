@@ -1,0 +1,39 @@
+{
+  "project_info": {
+    "project_number": "759277915002",
+    "project_id": "snapshot-pinterest-clone",
+    "storage_bucket": "snapshot-pinterest-clone.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:759277915002:android:9037358287954c0cb5a4c3",
+        "android_client_info": {
+          "package_name": "com.vivekkaapp.snap_shot"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "759277915002-jejdb21gfvn5ee95vgko7u04aqqkoiqa.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyBb81JztxEuFarHNdYlixnzD2grXZSw6aI"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "759277915002-jejdb21gfvn5ee95vgko7u04aqqkoiqa.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
