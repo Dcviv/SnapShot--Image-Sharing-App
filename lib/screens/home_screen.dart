@@ -1,6 +1,4 @@
 import 'dart:io';
-import 'dart:ui';
-
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_storage/firebase_storage.dart';
@@ -10,9 +8,10 @@ import 'package:image_cropper/image_cropper.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:intl/intl.dart';
 import 'package:snap_shot/app_res/colors.dart';
+import 'package:snap_shot/screens/chat_tile_page.dart';
 import 'package:snap_shot/screens/login.dart';
 import 'package:snap_shot/screens/search.dart';
-import 'package:snap_shot/screens/user_details.dart';
+import 'package:snap_shot/screens/post_detail_page.dart';
 import 'package:snap_shot/screens/user_profile.dart';
 
 class HomeScreen extends StatefulWidget {
@@ -25,6 +24,7 @@ class _HomeScreenState extends State<HomeScreen> {
   String? imageUrl;
   String? myImage;
   String? myName;
+  String? description = "";
 
   FirebaseAuth _auth = FirebaseAuth.instance;
   void _showImageDialog() {
@@ -32,14 +32,14 @@ class _HomeScreenState extends State<HomeScreen> {
         context: context,
         builder: (context) {
           return AlertDialog(
-            title: Text("Please choose an option"),
+            title: const Text("Please choose an option"),
             content: Column(
               children: [
                 InkWell(
                   onTap: () {
                     _getFromCamera(context);
                   },
-                  child: Row(
+                  child: const Row(
                     children: [
                       Padding(
                         padding: EdgeInsets.all(4),
@@ -60,7 +60,7 @@ class _HomeScreenState extends State<HomeScreen> {
                     //open gallery
                     _getFromGallery(context);
                   },
-                  child: Row(
+                  child: const Row(
                     children: [
                       Padding(
                         padding: EdgeInsets.all(4),
@@ -159,36 +159,40 @@ class _HomeScreenState extends State<HomeScreen> {
     return Padding(
       padding: EdgeInsets.all(8),
       child: Card(
-        elevation: 16,
-        shadowColor: AppColor.textColor,
-        child: Container(
+          elevation: 16,
+          shadowColor: AppColor.textColor,
+          child: Container(
             padding: EdgeInsets.all(5),
             child: Column(
               children: [
-                GestureDetector(
-                  onTap: () {
-                    Navigator.pushReplacement(
-                        context,
-                        MaterialPageRoute(
-                            builder: (_) => UserDetailsPage(
-                                img: img,
-                                userImage: userImg,
-                                name: name,
-                                date: date,
-                                docId: docId,
-                                userId: userID,
-                                downloads: downloads)));
-                  },
-                  child: Image.network(
-                    img,
-                    fit: BoxFit.cover,
+                SizedBox(
+                  child: GestureDetector(
+                    onTap: () {
+                      Navigator.push(
+                          context,
+                          MaterialPageRoute(
+                              builder: (_) => PostDetailsPage(
+                                    img: img,
+                                    userImage: userImg,
+                                    name: name,
+                                    date: date,
+                                    docId: docId,
+                                    userId: userID,
+                                    downloads: downloads,
+                                    description: description,
+                                  )));
+                    },
+                    child: Image.network(
+                      img,
+                      fit: BoxFit.cover,
+                    ),
                   ),
                 ),
-                SizedBox(
+                const SizedBox(
                   height: 15,
                 ),
                 Padding(
-                  padding: EdgeInsets.only(
+                  padding: const EdgeInsets.only(
                     left: 8,
                     right: 8,
                     bottom: 8,
@@ -199,7 +203,7 @@ class _HomeScreenState extends State<HomeScreen> {
                         radius: 30,
                         backgroundImage: NetworkImage(userImg),
                       ),
-                      SizedBox(
+                      const SizedBox(
                         width: 10,
                       ),
                       Column(
@@ -207,18 +211,18 @@ class _HomeScreenState extends State<HomeScreen> {
                         children: [
                           Text(
                             name,
-                            style: TextStyle(
+                            style: const TextStyle(
                                 color: Colors.black,
                                 fontWeight: FontWeight.bold),
                           ),
-                          SizedBox(
+                          const SizedBox(
                             height: 10,
                           ),
                           Text(
                             DateFormat('dd MMMM yyyy - hh:mm a')
                                 .format(date)
                                 .toString(),
-                            style: TextStyle(
+                            style: const TextStyle(
                                 color: Colors.black,
                                 fontWeight: FontWeight.bold),
                           )
@@ -228,8 +232,8 @@ class _HomeScreenState extends State<HomeScreen> {
                   ),
                 )
               ],
-            )),
-      ),
+            ),
+          )),
     );
   }
 
@@ -245,11 +249,11 @@ class _HomeScreenState extends State<HomeScreen> {
               Navigator.pushReplacement(
                 context,
                 MaterialPageRoute(
-                  builder: (_) => LoginPage(),
+                  builder: (_) => const LoginPage(),
                 ),
               );
             },
-            icon: Icon(
+            icon: const Icon(
               Icons.logout_rounded,
               color: Colors.white,
             ),
@@ -260,14 +264,14 @@ class _HomeScreenState extends State<HomeScreen> {
           actions: [
             IconButton(
               onPressed: () {
-                Navigator.pushReplacement(
+                Navigator.push(
                   context,
                   MaterialPageRoute(
                     builder: (_) => SearchPage(),
                   ),
                 );
               },
-              icon: Icon(
+              icon: const Icon(
                 Icons.search,
                 color: Colors.white,
               ),
@@ -282,13 +286,13 @@ class _HomeScreenState extends State<HomeScreen> {
                   ),
                 );
               },
-              icon: Icon(
+              icon: const Icon(
                 Icons.person,
                 color: Colors.white,
               ),
             ),
           ],
-          title: Text(
+          title: const Text(
             "SnapShot",
             style: TextStyle(
                 fontSize: 40,
@@ -298,35 +302,51 @@ class _HomeScreenState extends State<HomeScreen> {
           centerTitle: true,
         ),
         floatingActionButton: Wrap(
-          direction: Axis.horizontal,
+          direction: Axis.vertical,
           children: [
             Container(
-              margin: EdgeInsets.all(10),
+              margin: const EdgeInsets.all(10),
               child: FloatingActionButton(
                 heroTag: "1",
                 backgroundColor: AppColor.mainColor,
                 onPressed: () {
+                  Navigator.of(context).pushReplacement(MaterialPageRoute(
+                      builder: (context) => const ChatTilePage()));
+                },
+                child: const Icon(
+                  Icons.message,
+                  color: Colors.white,
+                ),
+              ),
+            ),
+            Container(
+              margin: const EdgeInsets.all(10),
+              child: FloatingActionButton(
+                heroTag: "2",
+                backgroundColor: AppColor.mainColor,
+                onPressed: () {
                   _showImageDialog();
                 },
-                child: Icon(
+                child: const Icon(
                   Icons.camera,
                   color: Colors.white,
                 ),
               ),
             ),
             Container(
-                margin: EdgeInsets.all(10),
-                child: FloatingActionButton(
-                  heroTag: "2",
-                  backgroundColor: AppColor.mainColor,
-                  onPressed: () {
-                    _uploadImage();
-                  },
-                  child: Icon(
-                    Icons.upload,
-                    color: Colors.white,
-                  ),
-                ))
+              margin: const EdgeInsets.all(10),
+              child: FloatingActionButton(
+                heroTag: "3",
+                backgroundColor: AppColor.mainColor,
+                onPressed: () {
+                  _uploadImage();
+                },
+                child: const Icon(
+                  Icons.upload,
+                  color: Colors.white,
+                ),
+              ),
+            ),
           ],
         ),
         body: StreamBuilder<QuerySnapshot>(
@@ -337,7 +357,7 @@ class _HomeScreenState extends State<HomeScreen> {
             builder: (context, AsyncSnapshot snapshot) {
               //AsyncSnapshot snapshot
               if (snapshot.connectionState == ConnectionState.waiting) {
-                return Center(
+                return const Center(
                   child: CircularProgressIndicator(
                     color: AppColor.mainColor,
                   ),
@@ -348,22 +368,23 @@ class _HomeScreenState extends State<HomeScreen> {
                     itemCount: snapshot.data!.docs.length,
                     itemBuilder: (BuildContext context, int index) {
                       return listViewWidget(
-                          snapshot.data!.docs[index].id,
-                          snapshot.data!.docs[index]["userPosts"],
-                          snapshot.data!.docs[index]["userImage"],
-                          snapshot.data!.docs[index]["name"],
-                          snapshot.data!.docs[index]["id"],
-                          snapshot.data!.docs[index]["createdAt"].toDate(),
-                          snapshot.data!.docs[index]["downloads"]);
+                        snapshot.data!.docs[index].id,
+                        snapshot.data!.docs[index]["userPosts"],
+                        snapshot.data!.docs[index]["userImage"],
+                        snapshot.data!.docs[index]["name"],
+                        snapshot.data!.docs[index]["id"],
+                        snapshot.data!.docs[index]["createdAt"].toDate(),
+                        snapshot.data!.docs[index]["downloads"],
+                      );
                     },
                   );
                 }
               } else {
-                return Center(
+                return const Center(
                   child: Text("There are no posts."),
                 );
               }
-              return Center(
+              return const Center(
                 child: Text("Something went wrong"),
               );
             }),

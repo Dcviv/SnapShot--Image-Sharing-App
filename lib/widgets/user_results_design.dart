@@ -1,13 +1,12 @@
-import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:snap_shot/app_res/colors.dart';
 import 'package:snap_shot/model/user_model.dart';
 import 'package:snap_shot/screens/user_specific_post.dart';
 
 class UserDesignWidget extends StatefulWidget {
-  Users? userModel;
-  BuildContext? context;
-  UserDesignWidget({
+  final Users? userModel;
+  final BuildContext? context;
+  const UserDesignWidget({
     required this.context,
     required this.userModel,
   });
@@ -24,7 +23,7 @@ class _UserDesignWidgetState extends State<UserDesignWidget> {
             context,
             MaterialPageRoute(
                 builder: (_) => UserSpecificPostPage(
-                      userId: widget.userModel!.id,
+                      userModel: widget.userModel!,
                     )));
       },
       child: Card(
@@ -39,14 +38,14 @@ class _UserDesignWidgetState extends State<UserDesignWidget> {
                 backgroundColor: AppColor.mainColor,
                 backgroundImage: NetworkImage(widget.userModel!.userImage!),
               ),
-              SizedBox(
+              const SizedBox(
                 height: 10,
               ),
               Text(
                 widget.userModel!.name!,
-                style: TextStyle(color: Colors.black, fontSize: 20),
+                style: const TextStyle(color: Colors.black, fontSize: 20),
               ),
-              SizedBox(
+              const SizedBox(
                 height: 10,
               ),
               Text(

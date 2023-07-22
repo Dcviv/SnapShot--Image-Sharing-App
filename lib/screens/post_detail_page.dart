@@ -2,14 +2,15 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
-import 'package:fluttertoast/fluttertoast.dart';
-import 'package:image_downloader/image_downloader.dart';
 import 'package:intl/intl.dart';
 import 'package:snap_shot/app_res/colors.dart';
+import 'package:snap_shot/model/user_model.dart';
 import 'package:snap_shot/screens/home_screen.dart';
 import 'package:snap_shot/widgets/button.dart';
 
-class UserDetailsPage extends StatefulWidget {
+import 'chat_screen.dart';
+
+class PostDetailsPage extends StatefulWidget {
   String? img;
   String? userImage;
   String? name;
@@ -17,8 +18,9 @@ class UserDetailsPage extends StatefulWidget {
   String? docId;
   String? userId;
   int? downloads;
+  String? description;
 
-  UserDetailsPage({
+  PostDetailsPage({
     required this.img,
     required this.userImage,
     required this.name,
@@ -26,23 +28,65 @@ class UserDetailsPage extends StatefulWidget {
     required this.docId,
     required this.userId,
     required this.downloads,
+    required this.description,
   });
   @override
-  State<UserDetailsPage> createState() => _UserDetailsPageState();
+  State<PostDetailsPage> createState() => _PostDetailsPage();
 }
 
-class _UserDetailsPageState extends State<UserDetailsPage> {
+class _PostDetailsPage extends State<PostDetailsPage> {
   int? total;
+  Users? peerModel;
+
+  void _readUserInfo() async {
+    FirebaseFirestore.instance
+        .collection('users')
+        .doc(widget.userId.toString())
+        .get()
+        .then<dynamic>((DocumentSnapshot snapshot) async {
+      setState(() {
+        widget.description = snapshot.get('userDescription').toString();
+      });
+    });
+  }
+
+  void _createPeerModel() {
+    peerModel = Users(
+        name: widget.name.toString(),
+        createdAt: "",
+        email: "",
+        id: widget.userId,
+        userImage: widget.userImage,
+        userDescription: "");
+  }
+
+  @override
+  void initState() {
+    super.initState();
+    _readUserInfo();
+    _createPeerModel();
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      floatingActionButton: FloatingActionButton(
+        onPressed: () {
+          Navigator.of(context).pushReplacement(MaterialPageRoute(
+              builder: (context) => ChatPage(
+                    peermodel: peerModel,
+                  )));
+        },
+        backgroundColor: AppColor.mainColor,
+        child: const Icon(Icons.message_rounded),
+      ),
       appBar: AppBar(
         leading: IconButton(
           onPressed: () {
             Navigator.pushReplacement(
                 context, MaterialPageRoute(builder: (_) => HomeScreen()));
           },
-          icon: Icon(
+          icon: const Icon(
             Icons.arrow_back,
             color: Colors.white,
           ),
@@ -52,7 +96,7 @@ class _UserDetailsPageState extends State<UserDetailsPage> {
         ),
         title: Text(
           widget.name!.toString(),
-          style: TextStyle(
+          style: const TextStyle(
             fontSize: 26,
             fontWeight: FontWeight.bold,
           ),
@@ -70,17 +114,17 @@ class _UserDetailsPageState extends State<UserDetailsPage> {
                     width: MediaQuery.of(context).size.width,
                   ),
                 ),
-                SizedBox(
+                const SizedBox(
                   height: 30,
                 ),
-                Text(
+                const Text(
                   "Owner's Information",
                   style: TextStyle(
                       fontSize: 30,
                       color: Colors.black,
                       fontWeight: FontWeight.bold),
                 ),
-                SizedBox(
+                const SizedBox(
                   height: 30,
                 ),
                 Container(
@@ -92,15 +136,15 @@ class _UserDetailsPageState extends State<UserDetailsPage> {
                           image: NetworkImage(widget.userImage!),
                           fit: BoxFit.cover)),
                 ),
-                SizedBox(
+                const SizedBox(
                   height: 10,
                 ),
                 Text(
                   "Uploaded by :- ${widget.name.toString()}",
-                  style: TextStyle(
+                  style: const TextStyle(
                       color: Colors.black, fontWeight: FontWeight.bold),
                 ),
-                SizedBox(
+                const SizedBox(
                   height: 10,
                 ),
                 Text(
@@ -110,7 +154,25 @@ class _UserDetailsPageState extends State<UserDetailsPage> {
                   style: TextStyle(
                       color: AppColor.textColor, fontWeight: FontWeight.bold),
                 ),
-                SizedBox(
+                const SizedBox(
+                  height: 10,
+                ),
+                const Text(
+                  "About Me :-",
+                  style: TextStyle(
+                      color: Colors.black, fontWeight: FontWeight.bold),
+                ),
+                const SizedBox(
+                  height: 10,
+                ),
+                Text(
+                  widget.description.toString(),
+                  style: const TextStyle(
+                      color: AppColor.spaceLight, fontWeight: FontWeight.w600),
+                  maxLines: 3,
+                  overflow: TextOverflow.ellipsis,
+                ),
+                const SizedBox(
                   height: 30,
                 ),
                 Row(
@@ -123,7 +185,7 @@ class _UserDetailsPageState extends State<UserDetailsPage> {
                     ),
                     Text(
                       " " + widget.downloads.toString(),
-                      style: TextStyle(
+                      style: const TextStyle(
                           color: Colors.black,
                           fontWeight: FontWeight.bold,
                           fontSize: 26),
@@ -136,29 +198,29 @@ class _UserDetailsPageState extends State<UserDetailsPage> {
                 Padding(
                   padding: EdgeInsets.only(left: 8, right: 8),
                   child: LoginButton(
-                    press: () async {
-                      try {
-                        var imageid =
-                            await ImageDownloader.downloadImage(widget.img!);
-                        if (imageid == null) {
-                          return;
-                        }
+                    press: () {
+                      // try {
+                      //   var imageid =
+                      //       await ImageDownloader.downloadImage(widget.img!);
+                      //   if (imageid == null) {
+                      //     return;
+                      //   }
 
-                        Fluttertoast.showToast(
-                            msg: "Image downloaded successfully.");
-                        total = widget.downloads! + 1;
-                        FirebaseFirestore.instance
-                            .collection('wallpaper')
-                            .doc(widget.docId)
-                            .update({
-                          'downloads': total,
-                        }).then((value) {
-                          Navigator.pushReplacement(context,
-                              MaterialPageRoute(builder: (_) => HomeScreen()));
-                        });
-                      } on PlatformException catch (error) {
-                        Fluttertoast.showToast(msg: error.toString());
-                      }
+                      //   Fluttertoast.showToast(
+                      //       msg: "Image downloaded successfully.");
+                      //   total = widget.downloads! + 1;
+                      //   FirebaseFirestore.instance
+                      //       .collection('wallpaper')
+                      //       .doc(widget.docId)
+                      //       .update({
+                      //     'downloads': total,
+                      //   }).then((value) {
+                      //     Navigator.pushReplacement(context,
+                      //         MaterialPageRoute(builder: (_) => HomeScreen()));
+                      //   });
+                      // } on PlatformException catch (error) {
+                      //   Fluttertoast.showToast(msg: error.toString());
+                      // }
                     },
                     text: "Download",
                   ),

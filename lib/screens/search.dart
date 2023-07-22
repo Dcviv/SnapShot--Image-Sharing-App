@@ -32,6 +32,20 @@ class _SearchPageState extends State<SearchPage> {
         child: Scaffold(
       backgroundColor: Colors.white,
       appBar: AppBar(
+        leading: IconButton(
+          onPressed: () {
+            Navigator.pushReplacement(
+              context,
+              MaterialPageRoute(
+                builder: (_) => HomeScreen(),
+              ),
+            );
+          },
+          icon: const Icon(
+            Icons.arrow_back,
+            color: Colors.white,
+          ),
+        ),
         flexibleSpace: Container(
           color: AppColor.mainColor,
         ),
@@ -43,31 +57,17 @@ class _SearchPageState extends State<SearchPage> {
             initSearchingPosts(textEntered);
           },
           decoration: InputDecoration(
-            hintText: Text(
-              "Search...",
+            hintText: const Text(
+              "Type here to search...",
               style: TextStyle(color: Colors.white),
             ).data.toString(),
-            hintStyle: TextStyle(color: Colors.white),
+            hintStyle: const TextStyle(color: Colors.white),
             border: InputBorder.none,
             suffixIcon: IconButton(
-              icon: Icon(Icons.search, color: Colors.white),
+              icon: const Icon(Icons.search, color: Colors.white),
               onPressed: () {
                 initSearchingPosts(userNameText);
               },
-            ),
-            prefixIcon: IconButton(
-              onPressed: () {
-                Navigator.pushReplacement(
-                  context,
-                  MaterialPageRoute(
-                    builder: (_) => HomeScreen(),
-                  ),
-                );
-              },
-              icon: Icon(
-                Icons.arrow_back,
-                color: Colors.white,
-              ),
             ),
           ),
         ),

@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:snap_shot/app_res/colors.dart';
 
 class TextFieldContainer extends StatelessWidget {
   final Widget child;

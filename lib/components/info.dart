@@ -1,7 +1,6 @@
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:fluttertoast/fluttertoast.dart';
-import 'package:snap_shot/app_res/colors.dart';
 import 'package:snap_shot/screens/forget_pass.dart';
 import 'package:snap_shot/screens/home_screen.dart';
 import 'package:snap_shot/screens/sign_up.dart';

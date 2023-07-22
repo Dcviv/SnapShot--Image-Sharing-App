@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:snap_shot/app_res/colors.dart';
-import 'package:snap_shot/components/info.dart';
 import 'package:snap_shot/components/signUp_info.dart';
 
 class SignUpHeadText extends StatelessWidget {

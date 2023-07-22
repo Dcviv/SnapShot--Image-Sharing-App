@@ -25,6 +25,8 @@ class _ProfileScreenState extends State<ProfileScreen> {
   File? imageFile;
   String? updatedUserName = "";
   String? updatedImageUrl;
+  String? description;
+  String? updatedUserDescription = "";
   Future _getDataFromDatabase() async {
     await FirebaseFirestore.instance
         .collection("users")
@@ -37,6 +39,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
           email = snapshot.data()!['email'].toString();
           phoneNo = snapshot.data()!['phoneNo.'].toString();
           img = snapshot.data()!["userImage"].toString();
+          description = snapshot.data()!["userDescription"].toString();
         });
       }
     });
@@ -48,6 +51,15 @@ class _ProfileScreenState extends State<ProfileScreen> {
         .doc(FirebaseAuth.instance.currentUser!.uid)
         .update({
       'name': updatedUserName,
+    });
+  }
+
+  Future _updateUserDescription() async {
+    await FirebaseFirestore.instance
+        .collection("users")
+        .doc(FirebaseAuth.instance.currentUser!.uid)
+        .update({
+      'userDescription': updatedUserDescription,
     });
   }
 
@@ -115,38 +127,48 @@ class _ProfileScreenState extends State<ProfileScreen> {
     });
   }
 
-  _displayTextUnitDialog(BuildContext context) async {
+  _displayTextUnitDialog(
+      BuildContext context, String title, bool updateUser) async {
     return showDialog(
         context: context,
         builder: (context) {
           return AlertDialog(
-            title: Text("Update  your namr here"),
+            title: Text(title),
             content: TextField(
               onChanged: (value) {
                 setState(() {
-                  updatedUserName = value;
+                  updateUser
+                      ? updatedUserName = value
+                      : updatedUserDescription = value;
                 });
               },
-              decoration: InputDecoration(hintText: "Type Here..."),
+              decoration: const InputDecoration(hintText: "Type Here..."),
             ),
             actions: [
               ElevatedButton(
                   onPressed: () {
                     Navigator.pop(context);
                   },
-                  child: Text(
+                  child: const Text(
                     "Cancel",
                     style: TextStyle(
                         color: AppColor.mainColor, fontWeight: FontWeight.bold),
                   )),
               ElevatedButton(
                   onPressed: () {
-                    _updateUserName();
-                    Navigator.pushReplacement(context,
-                        MaterialPageRoute(builder: (_) => ProfileScreen()));
-                    updateNameOnUserPosts();
+                    if (updateUser == true) {
+                      _updateUserName();
+                      Navigator.pushReplacement(context,
+                          MaterialPageRoute(builder: (_) => ProfileScreen()));
+                      updateNameOnUserPosts();
+                    } else {
+                      _updateUserDescription();
+                      Navigator.pushReplacement(context,
+                          MaterialPageRoute(builder: (_) => ProfileScreen()));
+                      // updateDescriptionOnUserPosts();
+                    }
                   },
-                  child: Text(
+                  child: const Text(
                     "Save",
                     style: TextStyle(
                         color: AppColor.mainColor, fontWeight: FontWeight.bold),
@@ -158,6 +180,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
 
   @override
   void initState() {
+    super.initState;
     _getDataFromDatabase();
   }
 
@@ -173,7 +196,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
                   onTap: () {
                     _getFromCamera(context);
                   },
-                  child: Row(
+                  child: const Row(
                     children: [
                       Padding(
                         padding: EdgeInsets.all(4),
@@ -194,7 +217,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
                     //open gallery
                     _getFromGallery(context);
                   },
-                  child: Row(
+                  child: const Row(
                     children: [
                       Padding(
                         padding: EdgeInsets.all(4),
@@ -251,7 +274,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
           color: AppColor.mainColor,
         ),
         centerTitle: true,
-        title: Text(
+        title: const Text(
           "SnapShot",
           style: TextStyle(
               fontSize: 40,
@@ -267,106 +290,165 @@ class _ProfileScreenState extends State<ProfileScreen> {
               ),
             );
           },
-          icon: Icon(
+          icon: const Icon(
             Icons.arrow_back,
             color: Colors.white,
           ),
         ),
       ),
-      body: Container(
-        child: Column(
-            mainAxisAlignment: MainAxisAlignment.center,
-            crossAxisAlignment: CrossAxisAlignment.center,
-            children: [
-              GestureDetector(
-                onTap: () {
-                  _showImageDialog();
-                },
-                child: CircleAvatar(
-                  radius: 80,
-                  backgroundImage: imageFile == null
-                      ? NetworkImage(img!)
-                      : Image.file(imageFile!).image,
+      body: StreamBuilder<DocumentSnapshot>(
+          stream: FirebaseFirestore.instance
+              .collection("users")
+              .doc(FirebaseAuth.instance.currentUser!.uid)
+              .snapshots(), //we take snapshot of a collection not document
+          builder: (context, AsyncSnapshot snapshot) {
+            //AsyncSnapshot snapshot
+            if (snapshot.connectionState == ConnectionState.waiting) {
+              return const Center(
+                child: CircularProgressIndicator(
+                  color: AppColor.mainColor,
                 ),
-              ),
-              SizedBox(
-                height: 10,
-              ),
-              Row(
-                mainAxisAlignment: MainAxisAlignment.center,
-                crossAxisAlignment: CrossAxisAlignment.center,
-                children: [
-                  Icon(Icons.person),
-                  SizedBox(
-                    width: 10,
-                  ),
-                  Text(
-                    name!,
-                    style: TextStyle(
-                      fontSize: 28,
-                      color: Colors.black,
-                    ),
-                  ),
-                  IconButton(
-                    onPressed: () {
-                      _displayTextUnitDialog(context);
-                    },
-                    icon: Icon(Icons.edit),
-                    color: AppColor.mainColor,
-                  ),
-                ],
-              ),
-              Row(
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  crossAxisAlignment: CrossAxisAlignment.center,
-                  children: [
-                    Icon(Icons.email),
-                    SizedBox(
-                      width: 10,
-                    ),
-                    Text(
-                      email!,
-                      style: TextStyle(fontSize: 24, color: Colors.black),
-                    ),
-                  ]),
-              SizedBox(
-                height: 10,
-              ),
-              Row(
-                mainAxisAlignment: MainAxisAlignment.center,
-                crossAxisAlignment: CrossAxisAlignment.center,
-                children: [
-                  Icon(
-                    Icons.phone,
-                  ),
-                  SizedBox(
-                    width: 10,
-                  ),
-                  Text(
-                    phoneNo!,
-                    style: TextStyle(
-                      fontSize: 24,
-                      color: Colors.black,
-                    ),
-                  ),
-                ],
-              ),
-              SizedBox(
-                height: 10,
-              ),
-              Container(
-                padding: EdgeInsets.only(left: 15, right: 15),
-                child: Center(
-                  child: LoginButton(
-                      text: "Logout",
-                      press: () {
-                        Navigator.pushReplacement(context,
-                            MaterialPageRoute(builder: (_) => LoginPage()));
-                      }),
-                ),
-              )
-            ]),
-      ),
+              );
+            } else if (snapshot.connectionState == ConnectionState.active) {
+              if (snapshot.data != null) {
+                return Container(
+                  padding: const EdgeInsets.all(20),
+                  child: Column(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      crossAxisAlignment: CrossAxisAlignment.center,
+                      children: [
+                        GestureDetector(
+                          onTap: () {
+                            _showImageDialog();
+                          },
+                          child: CircleAvatar(
+                            radius: 80,
+                            backgroundImage: imageFile == null
+                                ? NetworkImage(img!)
+                                : Image.file(imageFile!).image,
+                          ),
+                        ),
+                        const SizedBox(
+                          height: 10,
+                        ),
+                        Row(
+                          mainAxisAlignment: MainAxisAlignment.start,
+                          crossAxisAlignment: CrossAxisAlignment.center,
+                          children: [
+                            const Icon(Icons.person),
+                            const SizedBox(
+                              width: 10,
+                            ),
+                            Text(
+                              name!,
+                              style: const TextStyle(
+                                fontSize: 28,
+                                color: Colors.black,
+                              ),
+                            ),
+                            IconButton(
+                              onPressed: () {
+                                _displayTextUnitDialog(
+                                    context, "Update your user name!", true);
+                              },
+                              icon: const Icon(Icons.edit),
+                              color: AppColor.mainColor,
+                            ),
+                          ],
+                        ),
+                        Row(
+                          mainAxisAlignment: MainAxisAlignment.start,
+                          crossAxisAlignment: CrossAxisAlignment.center,
+                          children: [
+                            const Icon(Icons.description),
+                            const SizedBox(
+                              width: 10,
+                            ),
+                            Expanded(
+                              child: Text(
+                                description!,
+                                style: const TextStyle(
+                                  fontSize: 28,
+                                  color: Colors.black,
+                                ),
+                                overflow: TextOverflow.ellipsis,
+                                maxLines: 3,
+                              ),
+                            ),
+                            IconButton(
+                              onPressed: () {
+                                _displayTextUnitDialog(
+                                    context, "About Me!", false);
+                              },
+                              icon: const Icon(Icons.edit),
+                              color: AppColor.mainColor,
+                            ),
+                          ],
+                        ),
+                        Row(
+                            mainAxisAlignment: MainAxisAlignment.start,
+                            crossAxisAlignment: CrossAxisAlignment.center,
+                            children: [
+                              const Icon(Icons.email),
+                              const SizedBox(
+                                width: 10,
+                              ),
+                              Text(
+                                email!,
+                                style: const TextStyle(
+                                    fontSize: 24, color: Colors.black),
+                              ),
+                            ]),
+                        const SizedBox(
+                          height: 10,
+                        ),
+                        Row(
+                          mainAxisAlignment: MainAxisAlignment.start,
+                          crossAxisAlignment: CrossAxisAlignment.center,
+                          children: [
+                            const Icon(
+                              Icons.phone,
+                            ),
+                            const SizedBox(
+                              width: 10,
+                            ),
+                            Text(
+                              phoneNo!,
+                              style: const TextStyle(
+                                fontSize: 24,
+                                color: Colors.black,
+                              ),
+                            ),
+                          ],
+                        ),
+                        const SizedBox(
+                          height: 10,
+                        ),
+                        Container(
+                          padding: const EdgeInsets.only(left: 15, right: 15),
+                          child: Center(
+                            child: LoginButton(
+                                text: "Logout",
+                                press: () {
+                                  Navigator.pushReplacement(
+                                      context,
+                                      MaterialPageRoute(
+                                          builder: (_) => const LoginPage()));
+                                }),
+                          ),
+                        )
+                      ]),
+                );
+              }
+            } else {
+              return const Center(
+                child: Text("There are no posts."),
+              );
+            }
+            return const Center(
+              child: Text("Something went wrong"),
+            );
+          }),
     ));
   }
 }
